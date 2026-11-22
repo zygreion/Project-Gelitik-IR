@@ -8,10 +8,10 @@ import { EmptyState } from '../components/common/EmptyState';
 import { ErrorState } from '../components/common/ErrorState';
 import { useSearchResults } from '../hooks/useSearchResults';
 import { tokenize } from '../data/mockResults';
-import { toIsoDate } from '../utils/format';
+import { extractYear, toIsoDate } from '../utils/format';
 import type { SearchFilters as Filters } from '../types/search';
 
-const DEFAULT_FILTERS: Filters = { sort: 'relevance', sources: [] };
+const DEFAULT_FILTERS: Filters = { sort: 'relevance', year: 'all', sources: [] };
 
 export function ResultsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -45,10 +45,17 @@ export function ResultsPage() {
   const visibleResults = useMemo(() => {
     if (!data) return [];
 
-    const filtered =
-      filters.sources.length > 0
-        ? data.results.filter((result) => result.source && filters.sources.includes(result.source))
-        : data.results;
+    let filtered = data.results;
+
+    if (filters.sources.length > 0) {
+      filtered = filtered.filter(
+        (result) => result.source && filters.sources.includes(result.source)
+      );
+    }
+
+    if (filters.year && filters.year !== 'all') {
+      filtered = filtered.filter((result) => extractYear(result.date) === filters.year);
+    }
 
     if (filters.sort === 'relevance') return filtered;
 
@@ -118,7 +125,7 @@ export function ResultsPage() {
                 title="Tidak ada hasil yang cocok dengan penyaring"
                 description={
                   data.results.length > 0
-                    ? 'Semua hasil disembunyikan oleh penyaring yang aktif. Coba longgarkan kriteria sumber.'
+                    ? 'Semua hasil disembunyikan oleh penyaring yang aktif. Coba longgarkan kriteria penyaring.'
                     : 'Tidak ada dokumen yang cocok dengan kata kunci tersebut. Coba gunakan istilah yang lebih umum.'
                 }
               >

@@ -1,4 +1,4 @@
-import { ArrowDownUp } from 'lucide-react';
+import { ArrowDownUp, Calendar, Landmark } from 'lucide-react';
 import type { SearchFilters, SearchResult, SortOption } from '../../types/search';
 
 interface SearchFiltersProps {
@@ -13,6 +13,13 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'oldest', label: 'Terlama' },
 ];
 
+const YEAR_OPTIONS: { value: string; label: string }[] = [
+  { value: 'all', label: 'Semua Tahun' },
+  { value: '2026', label: '2026' },
+  { value: '2025', label: '2025' },
+  { value: '2024', label: '2024' },
+];
+
 export function SearchFilters({ results, filters, onChange }: SearchFiltersProps) {
   const sourceCounts = new Map<string, number>();
   for (const result of results) {
@@ -24,6 +31,7 @@ export function SearchFilters({ results, filters, onChange }: SearchFiltersProps
   const sources = Array.from(sourceCounts.entries()).sort((a, b) => a[0].localeCompare(b[0]));
 
   const handleSort = (sort: SortOption) => onChange({ ...filters, sort });
+  const handleYear = (year: string) => onChange({ ...filters, year });
 
   const toggleSource = (source: string) => {
     const active = filters.sources.includes(source);
@@ -33,7 +41,10 @@ export function SearchFilters({ results, filters, onChange }: SearchFiltersProps
     });
   };
 
-  const isDefault = filters.sort === 'relevance' && filters.sources.length === 0;
+  const isDefault =
+    filters.sort === 'relevance' &&
+    (!filters.year || filters.year === 'all') &&
+    filters.sources.length === 0;
 
   return (
     <aside className="filters" aria-label="Penyaring hasil">
@@ -56,13 +67,36 @@ export function SearchFilters({ results, filters, onChange }: SearchFiltersProps
         ))}
       </div>
 
+      <div className="filters__group">
+        <h2 className="filters__title">
+          <Calendar size={12} aria-hidden="true" style={{ display: 'inline', marginRight: 6 }} />
+          Tahun
+        </h2>
+        {YEAR_OPTIONS.map((option) => (
+          <label className="filters__option" key={option.value}>
+            <input
+              type="radio"
+              name="year"
+              value={option.value}
+              checked={(filters.year ?? 'all') === option.value}
+              onChange={() => handleYear(option.value)}
+            />
+            <span>{option.label}</span>
+          </label>
+        ))}
+      </div>
+
       {sources.length > 0 && (
         <div className="filters__group">
-          <h2 className="filters__title">Sumber</h2>
+          <h2 className="filters__title">
+            <Landmark size={12} aria-hidden="true" style={{ display: 'inline', marginRight: 6 }} />
+            Sumber
+          </h2>
           {sources.map(([source, count]) => (
             <label className="filters__option" key={source}>
               <input
                 type="checkbox"
+                name="source"
                 checked={filters.sources.includes(source)}
                 onChange={() => toggleSource(source)}
               />
@@ -77,7 +111,7 @@ export function SearchFilters({ results, filters, onChange }: SearchFiltersProps
         <button
           type="button"
           className="filters__reset"
-          onClick={() => onChange({ sort: 'relevance', sources: [] })}
+          onClick={() => onChange({ sort: 'relevance', year: 'all', sources: [] })}
         >
           Atur ulang penyaring
         </button>

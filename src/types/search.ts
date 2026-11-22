@@ -72,6 +72,7 @@ export interface RawMockDocument {
 
 export interface SearchFilters {
   sort: SortOption;
+  year?: string;
   sources: string[];
 }
 

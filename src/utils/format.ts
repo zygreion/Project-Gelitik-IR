@@ -28,7 +28,7 @@ export function formatDate(value?: string): string {
     return `${Number(day)} ${MONTHS_ID[Number(month) - 1]} ${year}`;
   }
 
-  const dmy = /^(\d{1,2})-(\d{1,2})-(\d{4})$/.exec(trimmed);
+  const dmy = /^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/.exec(trimmed);
   if (dmy) {
     const [, day, month, year] = dmy;
     const monthIndex = Number(month) - 1;
@@ -54,7 +54,7 @@ export function toIsoDate(value?: string): string | undefined {
   const iso = /^(\d{4})-(\d{2})-(\d{2})$/.exec(trimmed);
   if (iso) return trimmed;
 
-  const dmy = /^(\d{1,2})-(\d{1,2})-(\d{4})$/.exec(trimmed);
+  const dmy = /^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/.exec(trimmed);
   if (dmy) {
     const [, day, month, year] = dmy;
     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
@@ -64,6 +64,15 @@ export function toIsoDate(value?: string): string | undefined {
   if (!Number.isNaN(parsed.getTime())) return parsed.toISOString().slice(0, 10);
 
   return undefined;
+}
+
+/** Extracts the 4-digit year from a date string. */
+export function extractYear(value?: string): string | undefined {
+  if (!value) return undefined;
+  const iso = toIsoDate(value);
+  if (iso) return iso.slice(0, 4);
+  const match = /\b(19\d\d|20\d\d)\b/.exec(value);
+  return match ? match[1] : undefined;
 }
 
 /** Splits a document body into readable paragraphs. */
