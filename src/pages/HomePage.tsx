@@ -17,7 +17,7 @@ const FEATURES = [
   {
     icon: Gauge,
     title: 'Peringkatan relevansi',
-    text: 'Hasil diurutkan berdasarkan skor relevansi yang dihasilkan model Information Retrieval, bukan urutan bawaan antarmuka.',
+    text: 'Hasil diurutkan berdasarkan skor relevansi yang dihasilkan model Information Retrieval, bukan bawaan antarmuka.',
   },
   {
     icon: Database,
