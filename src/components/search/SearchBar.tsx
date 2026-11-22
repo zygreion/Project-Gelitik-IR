@@ -37,15 +37,15 @@ export function SearchBar({
   };
 
   return (
-    <div>
+    <div style={{ width: "100%" }}>
       <form
         className={[
-          'searchbar',
-          size === 'lg' ? 'searchbar--lg' : '',
-          error ? 'searchbar--invalid' : '',
+          "searchbar",
+          size === "lg" ? "searchbar--lg" : "",
+          error ? "searchbar--invalid" : "",
         ]
           .filter(Boolean)
-          .join(' ')}
+          .join(" ")}
         role="search"
         onSubmit={handleSubmit}
         noValidate
@@ -58,7 +58,8 @@ export function SearchBar({
         <input
           id={inputId}
           className="searchbar__input"
-          type="search"
+          // type="search"
+          type="text"
           value={value}
           autoFocus={autoFocus}
           autoComplete="off"
@@ -75,14 +76,18 @@ export function SearchBar({
           <button
             type="button"
             className="searchbar__clear"
-            onClick={() => onChange('')}
+            onClick={() => onChange("")}
             aria-label="Hapus kata kunci"
           >
             <X size={18} />
           </button>
         )}
 
-        <button type="submit" className="searchbar__submit" disabled={isLoading}>
+        <button
+          type="submit"
+          className="searchbar__submit"
+          disabled={isLoading}
+        >
           <Search size={17} aria-hidden="true" />
           <span>Cari</span>
         </button>

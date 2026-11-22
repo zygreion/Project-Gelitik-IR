@@ -59,6 +59,17 @@ export interface MockDocument {
   text: string;
 }
 
+export interface RawMockDocument {
+  doc_id: string;
+  title: string;
+  date: string;
+  media: string;
+  topic: string;
+  url: string;
+  author: string;
+  text: string[];
+}
+
 export interface SearchFilters {
   sort: SortOption;
   sources: string[];
