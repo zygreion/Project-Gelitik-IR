@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Read(//c/tmp/**)",
+      "Bash(netstat -ano)",
+      "Bash(awk '{print $5}')",
+      "Read(//c/Users/USER/SEMESTER 7/Temu Kembali Informasi/**)",
+      "Bash(rm -rf \"Project Gelitik IR/.shots\" corpus_dump.json gen_corpus.py)",
+      "Bash(rm -rf /tmp/gtest)"
+    ]
+  }
+}

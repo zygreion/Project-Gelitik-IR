@@ -1,0 +1,92 @@
+import { ArrowDownUp } from 'lucide-react';
+import type { SearchFilters, SearchResult, SortOption } from '../../types/search';
+
+interface SearchFiltersProps {
+  results: SearchResult[];
+  filters: SearchFilters;
+  onChange: (filters: SearchFilters) => void;
+}
+
+const SORT_OPTIONS: { value: SortOption; label: string }[] = [
+  { value: 'relevance', label: 'Relevansi' },
+  { value: 'newest', label: 'Terbaru' },
+  { value: 'oldest', label: 'Terlama' },
+];
+
+export function SearchFilters({ results, filters, onChange }: SearchFiltersProps) {
+  const sourceCounts = new Map<string, number>();
+  for (const result of results) {
+    const source = result.source?.trim();
+    if (source) {
+      sourceCounts.set(source, (sourceCounts.get(source) ?? 0) + 1);
+    }
+  }
+  const sources = Array.from(sourceCounts.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+
+  const handleSort = (sort: SortOption) => onChange({ ...filters, sort });
+
+  const toggleSource = (source: string) => {
+    const active = filters.sources.includes(source);
+    onChange({
+      ...filters,
+      sources: active ? filters.sources.filter((entry) => entry !== source) : [...filters.sources, source],
+    });
+  };
+
+  const isDefault = filters.sort === 'relevance' && filters.sources.length === 0;
+
+  return (
+    <aside className="filters" aria-label="Penyaring hasil">
+      <div className="filters__group">
+        <h2 className="filters__title">
+          <ArrowDownUp size={12} aria-hidden="true" style={{ display: 'inline', marginRight: 6 }} />
+          Urutkan
+        </h2>
+        {SORT_OPTIONS.map((option) => (
+          <label className="filters__option" key={option.value}>
+            <input
+              type="radio"
+              name="sort"
+              value={option.value}
+              checked={filters.sort === option.value}
+              onChange={() => handleSort(option.value)}
+            />
+            <span>{option.label}</span>
+          </label>
+        ))}
+      </div>
+
+      {sources.length > 0 && (
+        <div className="filters__group">
+          <h2 className="filters__title">Sumber</h2>
+          {sources.map(([source, count]) => (
+            <label className="filters__option" key={source}>
+              <input
+                type="checkbox"
+                checked={filters.sources.includes(source)}
+                onChange={() => toggleSource(source)}
+              />
+              <span>{source}</span>
+              <span className="filters__count">{count}</span>
+            </label>
+          ))}
+        </div>
+      )}
+
+      {!isDefault && (
+        <button
+          type="button"
+          className="filters__reset"
+          onClick={() => onChange({ sort: 'relevance', sources: [] })}
+        >
+          Atur ulang penyaring
+        </button>
+      )}
+
+      <p className="filters__note">
+        Penyaring diterapkan di sisi peramban pada hasil yang sudah dikembalikan
+        oleh model IR.
+      </p>
+    </aside>
+  );
+}
