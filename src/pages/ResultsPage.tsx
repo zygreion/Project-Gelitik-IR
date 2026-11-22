@@ -34,6 +34,10 @@ export function ResultsPage() {
     if (!trimmed) return;
     setFilters(DEFAULT_FILTERS);
     setSearchParams({ q: trimmed });
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   const terms = useMemo(() => tokenize(query), [query]);

@@ -39,6 +39,10 @@ export function HomePage() {
     const trimmed = value.trim();
     if (!trimmed) return;
     navigate(`/search?q=${encodeURIComponent(trimmed)}`);
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   return (
