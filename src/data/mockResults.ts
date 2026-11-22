@@ -8,6 +8,7 @@
  */
 
 import { DEMO_CORPUS } from './demoCorpus';
+import { extractYear, toIsoDate } from '../utils/format';
 import type {
   DocumentDetail,
   SearchRequest,
@@ -116,26 +117,60 @@ export function runMockSearch(request: SearchRequest): SearchResponse {
 
   const queryTf = termFrequency(terms);
 
-  const ranked = DEMO_CORPUS.map((doc, index) => {
-    const titleTf = termFrequency(tokenize(doc.title));
-    const bodyTf = termFrequency(tokenize(doc.text));
-
-    // Title matches are weighted higher, mirroring standard field weighting.
-    const combined = new Map<string, number>();
-    for (const [term, count] of bodyTf) combined.set(term, count);
-    for (const [term, count] of titleTf) {
-      combined.set(term, (combined.get(term) ?? 0) + count * 3);
+  const candidateDocs = DEMO_CORPUS.filter((doc) => {
+    if (request.sources && request.sources.length > 0) {
+      const media = doc.media?.trim();
+      if (!media || !request.sources.includes(media)) {
+        return false;
+      }
     }
+    if (request.year && request.year !== 'all' && extractYear(doc.date) !== request.year) {
+      return false;
+    }
+    return true;
+  });
 
-    return {
-      doc,
-      score: cosineSimilarity(queryTf, combined, IDF),
-      index,
-    };
-  })
-    .filter((entry) => entry.score > 0)
-    .sort((a, b) => b.score - a.score || a.index - b.index)
-    .slice(0, topK);
+  const matching = candidateDocs
+    .map((doc, index) => {
+      const titleTf = termFrequency(tokenize(doc.title));
+      const bodyTf = termFrequency(tokenize(doc.text));
+
+      // Title matches are weighted higher, mirroring standard field weighting.
+      const combined = new Map<string, number>();
+      for (const [term, count] of bodyTf) combined.set(term, count);
+      for (const [term, count] of titleTf) {
+        combined.set(term, (combined.get(term) ?? 0) + count * 3);
+      }
+
+      return {
+        doc,
+        score: cosineSimilarity(queryTf, combined, IDF),
+        index,
+      };
+    })
+    .filter((entry) => entry.score > 0);
+
+  const sort = request.sort ?? 'relevance';
+  if (sort === 'newest') {
+    matching.sort((a, b) => {
+      const dateA = toIsoDate(a.doc.date) ?? '';
+      const dateB = toIsoDate(b.doc.date) ?? '';
+      if (dateA === dateB) return b.score - a.score || a.index - b.index;
+      return dateB.localeCompare(dateA);
+    });
+  } else if (sort === 'oldest') {
+    matching.sort((a, b) => {
+      const dateA = toIsoDate(a.doc.date) ?? '';
+      const dateB = toIsoDate(b.doc.date) ?? '';
+      if (dateA === dateB) return b.score - a.score || a.index - b.index;
+      return dateA.localeCompare(dateB);
+    });
+  } else {
+    // relevance
+    matching.sort((a, b) => b.score - a.score || a.index - b.index);
+  }
+
+  const ranked = matching.slice(0, topK);
 
   const results: SearchResult[] = ranked.map(({ doc, score }) => ({
     id: doc.id,
@@ -151,7 +186,7 @@ export function runMockSearch(request: SearchRequest): SearchResponse {
 
   return {
     query,
-    total_results: results.length,
+    total_results: matching.length,
     results,
   };
 }

@@ -11,6 +11,7 @@ import {
   DEFAULT_TOP_K,
   SearchError,
   type DocumentDetail,
+  type SearchFilters,
   type SearchRequest,
   type SearchResponse,
   type SearchResult,
@@ -124,6 +125,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
  */
 export async function searchDocuments(
   query: string,
+  filters?: SearchFilters,
   topK: number = DEFAULT_TOP_K,
   signal?: AbortSignal,
 ): Promise<SearchResponse> {
@@ -132,16 +134,23 @@ export async function searchDocuments(
     throw new SearchError('Kata kunci pencarian tidak boleh kosong.');
   }
 
+  const searchRequest: SearchRequest = {
+    query: trimmed,
+    top_k: topK,
+    sort: filters?.sort,
+    year: filters?.year,
+    sources: filters?.sources,
+  };
+
   if (IS_MOCK_MODE) {
     await delay(MOCK_LATENCY_MS);
     if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
-    const request: SearchRequest = { query: trimmed, top_k: topK };
-    return runMockSearch(request);
+    return runMockSearch(searchRequest);
   }
 
   const payload = await request<unknown>('/search', {
     method: 'POST',
-    body: JSON.stringify({ query: trimmed, top_k: topK }),
+    body: JSON.stringify(searchRequest),
     signal,
   });
 

@@ -2,7 +2,7 @@ import { ArrowDownUp, Calendar, Landmark } from 'lucide-react';
 import type { SearchFilters, SearchResult, SortOption } from '../../types/search';
 
 interface SearchFiltersProps {
-  results: SearchResult[];
+  results?: SearchResult[];
   filters: SearchFilters;
   onChange: (filters: SearchFilters) => void;
 }
@@ -20,16 +20,9 @@ const YEAR_OPTIONS: { value: string; label: string }[] = [
   { value: '2024', label: '2024' },
 ];
 
-export function SearchFilters({ results, filters, onChange }: SearchFiltersProps) {
-  const sourceCounts = new Map<string, number>();
-  for (const result of results) {
-    const source = result.source?.trim();
-    if (source) {
-      sourceCounts.set(source, (sourceCounts.get(source) ?? 0) + 1);
-    }
-  }
-  const sources = Array.from(sourceCounts.entries()).sort((a, b) => a[0].localeCompare(b[0]));
+const SOURCE_OPTIONS = ['ANTARA', 'IDN Times', 'Kompas'];
 
+export function SearchFilters({ filters, onChange }: SearchFiltersProps) {
   const handleSort = (sort: SortOption) => onChange({ ...filters, sort });
   const handleYear = (year: string) => onChange({ ...filters, year });
 
@@ -86,26 +79,23 @@ export function SearchFilters({ results, filters, onChange }: SearchFiltersProps
         ))}
       </div>
 
-      {sources.length > 0 && (
-        <div className="filters__group">
-          <h2 className="filters__title">
-            <Landmark size={12} aria-hidden="true" style={{ display: 'inline', marginRight: 6 }} />
-            Sumber
-          </h2>
-          {sources.map(([source, count]) => (
-            <label className="filters__option" key={source}>
-              <input
-                type="checkbox"
-                name="source"
-                checked={filters.sources.includes(source)}
-                onChange={() => toggleSource(source)}
-              />
-              <span>{source}</span>
-              <span className="filters__count">{count}</span>
-            </label>
-          ))}
-        </div>
-      )}
+      <div className="filters__group">
+        <h2 className="filters__title">
+          <Landmark size={12} aria-hidden="true" style={{ display: 'inline', marginRight: 6 }} />
+          Sumber
+        </h2>
+        {SOURCE_OPTIONS.map((source) => (
+          <label className="filters__option" key={source}>
+            <input
+              type="checkbox"
+              name="source"
+              checked={filters.sources.includes(source)}
+              onChange={() => toggleSource(source)}
+            />
+            <span>{source}</span>
+          </label>
+        ))}
+      </div>
 
       {!isDefault && (
         <button
@@ -116,11 +106,6 @@ export function SearchFilters({ results, filters, onChange }: SearchFiltersProps
           Atur ulang penyaring
         </button>
       )}
-
-      <p className="filters__note">
-        Penyaring diterapkan di sisi peramban pada hasil yang sudah dikembalikan
-        oleh model IR.
-      </p>
     </aside>
   );
 }

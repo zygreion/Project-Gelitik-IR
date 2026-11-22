@@ -10,6 +10,9 @@
 export interface SearchRequest {
   query: string;
   top_k?: number;
+  sort?: SortOption;
+  year?: string;
+  sources?: string[];
 }
 
 /** A single ranked document, as rendered by the results list. */

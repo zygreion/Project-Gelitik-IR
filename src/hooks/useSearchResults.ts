@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { searchDocuments } from '../services/searchService';
-import { SearchError, type SearchResponse } from '../types/search';
+import { SearchError, type SearchFilters, type SearchResponse } from '../types/search';
 
 export type SearchStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -12,7 +12,7 @@ interface UseSearchResults {
 }
 
 interface SearchState {
-  /** Identifies the request the state belongs to (query + attempt). */
+  /** Identifies the request the state belongs to (query + filters + attempt). */
   key: string;
   status: SearchStatus;
   data: SearchResponse | null;
@@ -22,16 +22,19 @@ interface SearchState {
 const EMPTY_STATE: SearchState = { key: '', status: 'idle', data: null, error: null };
 
 /**
- * Runs a search whenever the query changes and exposes the loading, empty
+ * Runs a search whenever the query or filters change and exposes the loading, empty
  * and error states the UI needs. The status is derived from the request key
- * so a new query immediately reads as "loading" without a cascading render.
+ * so a new query or filter immediately reads as "loading" without a cascading render.
  */
-export function useSearchResults(query: string): UseSearchResults {
+export function useSearchResults(query: string, filters?: SearchFilters): UseSearchResults {
   const [attempt, setAttempt] = useState(0);
   const [state, setState] = useState<SearchState>(EMPTY_STATE);
 
   const trimmed = query.trim();
-  const key = [trimmed, attempt].join('~');
+  const sourcesKey = filters?.sources ? [...filters.sources].sort().join(',') : '';
+  const sortKey = filters?.sort ?? 'relevance';
+  const yearKey = filters?.year ?? 'all';
+  const key = [trimmed, attempt, sortKey, yearKey, sourcesKey].join('~');
 
   useEffect(() => {
     if (!trimmed) return;
@@ -39,7 +42,7 @@ export function useSearchResults(query: string): UseSearchResults {
     const controller = new AbortController();
     let active = true;
 
-    searchDocuments(trimmed, undefined, controller.signal)
+    searchDocuments(trimmed, filters, undefined, controller.signal)
       .then((response) => {
         if (!active) return;
         setState({ key, status: 'success', data: response, error: null });
@@ -57,7 +60,7 @@ export function useSearchResults(query: string): UseSearchResults {
       active = false;
       controller.abort();
     };
-  }, [trimmed, key]);
+  }, [trimmed, key, filters]);
 
   const retry = useCallback(() => setAttempt((value) => value + 1), []);
 

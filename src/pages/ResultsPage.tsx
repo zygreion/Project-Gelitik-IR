@@ -8,7 +8,6 @@ import { EmptyState } from '../components/common/EmptyState';
 import { ErrorState } from '../components/common/ErrorState';
 import { useSearchResults } from '../hooks/useSearchResults';
 import { tokenize } from '../data/mockResults';
-import { extractYear, toIsoDate } from '../utils/format';
 import type { SearchFilters as Filters } from '../types/search';
 
 const DEFAULT_FILTERS: Filters = { sort: 'relevance', year: 'all', sources: [] };
@@ -21,7 +20,7 @@ export function ResultsPage() {
   const [syncedQuery, setSyncedQuery] = useState(query);
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
 
-  const { status, data, error, retry } = useSearchResults(query);
+  const { status, data, error, retry } = useSearchResults(query, filters);
 
   // Keep the input in sync with the URL query without an extra render pass.
   if (query !== syncedQuery) {
@@ -42,34 +41,12 @@ export function ResultsPage() {
 
   const terms = useMemo(() => tokenize(query), [query]);
 
-  const visibleResults = useMemo(() => {
-    if (!data) return [];
+  const visibleResults = data?.results ?? [];
 
-    let filtered = data.results;
-
-    if (filters.sources.length > 0) {
-      filtered = filtered.filter(
-        (result) => result.source && filters.sources.includes(result.source)
-      );
-    }
-
-    if (filters.year && filters.year !== 'all') {
-      filtered = filtered.filter((result) => extractYear(result.date) === filters.year);
-    }
-
-    if (filters.sort === 'relevance') return filtered;
-
-    const withDate = [...filtered].sort((a, b) => {
-      const dateA = toIsoDate(a.date) ?? '';
-      const dateB = toIsoDate(b.date) ?? '';
-      if (dateA === dateB) return 0;
-      return filters.sort === 'newest' ? dateB.localeCompare(dateA) : dateA.localeCompare(dateB);
-    });
-
-    return withDate;
-  }, [data, filters]);
-
-  const sourceList = data?.results ?? [];
+  const isDefaultFilters =
+    filters.sort === 'relevance' &&
+    (!filters.year || filters.year === 'all') &&
+    filters.sources.length === 0;
 
   return (
     <main>
@@ -122,14 +99,14 @@ export function ResultsPage() {
 
             {status === 'success' && data && visibleResults.length === 0 && (
               <EmptyState
-                title="Tidak ada hasil yang cocok dengan penyaring"
+                title="Tidak ada hasil yang cocok"
                 description={
-                  data.results.length > 0
-                    ? 'Semua hasil disembunyikan oleh penyaring yang aktif. Coba longgarkan kriteria penyaring.'
+                  !isDefaultFilters
+                    ? 'Tidak ada dokumen yang cocok dengan kombinasi kata kunci dan penyaring yang aktif. Coba longgarkan kriteria penyaring.'
                     : 'Tidak ada dokumen yang cocok dengan kata kunci tersebut. Coba gunakan istilah yang lebih umum.'
                 }
               >
-                {data.results.length > 0 && (
+                {!isDefaultFilters && (
                   <button
                     type="button"
                     className="btn btn--secondary"
@@ -143,8 +120,8 @@ export function ResultsPage() {
           </div>
 
           <div className="results-layout__aside">
-            {status === 'success' && sourceList.length > 0 && (
-              <SearchFilters results={sourceList} filters={filters} onChange={setFilters} />
+            {Boolean(query) && (
+              <SearchFilters filters={filters} onChange={setFilters} />
             )}
           </div>
         </div>
