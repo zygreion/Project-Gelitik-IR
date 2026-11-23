@@ -15,10 +15,14 @@ const DEFAULT_FILTERS: Filters = { sort: 'relevance', year: 'all', sources: [] }
 export function ResultsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get('q') ?? '';
+  const urlYear = searchParams.get('year') ?? 'all';
 
   const [inputValue, setInputValue] = useState(query);
   const [syncedQuery, setSyncedQuery] = useState(query);
-  const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
+  const [filters, setFilters] = useState<Filters>(() => ({
+    ...DEFAULT_FILTERS,
+    year: searchParams.get('year') ?? 'all',
+  }));
 
   const { status, data, error, retry } = useSearchResults(query, filters);
 
@@ -27,6 +31,22 @@ export function ResultsPage() {
     setSyncedQuery(query);
     setInputValue(query);
   }
+
+  // Keep filters.year in sync with URL if changed externally (e.g. back/forward button)
+  if (filters.year !== urlYear) {
+    setFilters((prev) => ({ ...prev, year: urlYear }));
+  }
+
+  const handleFiltersChange = (newFilters: Filters) => {
+    setFilters(newFilters);
+    const nextParams = new URLSearchParams(searchParams);
+    if (newFilters.year && newFilters.year !== 'all') {
+      nextParams.set('year', newFilters.year);
+    } else {
+      nextParams.delete('year');
+    }
+    setSearchParams(nextParams);
+  };
 
   useEffect(() => {
     if (searchParams.has('q')) {
@@ -122,7 +142,7 @@ export function ResultsPage() {
                   <button
                     type="button"
                     className="btn btn--secondary"
-                    onClick={() => setFilters(DEFAULT_FILTERS)}
+                    onClick={() => handleFiltersChange(DEFAULT_FILTERS)}
                   >
                     Atur ulang penyaring
                   </button>
@@ -133,7 +153,7 @@ export function ResultsPage() {
 
           <div className="results-layout__aside">
             {Boolean(query) && (
-              <SearchFilters filters={filters} onChange={setFilters} />
+              <SearchFilters filters={filters} onChange={handleFiltersChange} />
             )}
           </div>
         </div>
