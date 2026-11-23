@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { SearchBar } from '../components/search/SearchBar';
 import { SearchResultList } from '../components/results/SearchResultList';
@@ -27,6 +27,18 @@ export function ResultsPage() {
     setSyncedQuery(query);
     setInputValue(query);
   }
+
+  useEffect(() => {
+    if (searchParams.has('q')) {
+      window.document.title = `GELITIK - ${searchParams.get('q')}`;
+    } else {
+      window.document.title = 'GELITIK — Pencarian';
+    }
+
+    return () => {
+      window.document.title = 'GELITIK — Pencarian';
+    };
+  }, [searchParams]);
 
   const submit = (value: string) => {
     const trimmed = value.trim();
