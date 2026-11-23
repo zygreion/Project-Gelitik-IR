@@ -51,6 +51,18 @@ export function DocumentPage() {
   const status = state?.id === id ? state.status : 'loading';
   const document = state?.id === id ? state.document : null;
 
+  useEffect(() => {
+    if (document?.title) {
+      window.document.title = `GELITIK - ${document.title}`;
+    } else {
+      window.document.title = 'GELITIK — Google Politik';
+    }
+
+    return () => {
+      window.document.title = 'GELITIK — Google Politik';
+    };
+  }, [document?.title]);
+
   const backTo = query ? `/search?q=${encodeURIComponent(query)}` : '/search';
 
   return (
