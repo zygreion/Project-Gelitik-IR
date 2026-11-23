@@ -63,7 +63,7 @@ export function DocumentPage() {
     };
   }, [document?.title]);
 
-  const backTo = query ? `/search?q=${encodeURIComponent(query)}` : '/search';
+  const backTo = query ? `/search?${new URLSearchParams({ q: query })}` : '/search';
 
   return (
     <main className="document">

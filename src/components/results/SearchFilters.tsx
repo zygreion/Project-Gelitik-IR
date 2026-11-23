@@ -1,5 +1,5 @@
-import { ArrowDownUp, Calendar, Landmark } from 'lucide-react';
-import type { SearchFilters, SearchResult, SortOption } from '../../types/search';
+import { Calendar } from 'lucide-react';
+import type { SearchFilters, SearchResult } from '../../types/search';
 
 interface SearchFiltersProps {
   results?: SearchResult[];
@@ -7,11 +7,11 @@ interface SearchFiltersProps {
   onChange: (filters: SearchFilters) => void;
 }
 
-const SORT_OPTIONS: { value: SortOption; label: string }[] = [
+/* const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'relevance', label: 'Relevansi' },
   { value: 'newest', label: 'Terbaru' },
   { value: 'oldest', label: 'Terlama' },
-];
+]; */
 
 const YEAR_OPTIONS: { value: string; label: string }[] = [
   { value: 'all', label: 'Semua Tahun' },
@@ -20,19 +20,19 @@ const YEAR_OPTIONS: { value: string; label: string }[] = [
   { value: '2024', label: '2024' },
 ];
 
-const SOURCE_OPTIONS = ['ANTARA', 'IDN Times', 'Kompas'];
+/* const SOURCE_OPTIONS = ['ANTARA', 'IDN Times', 'Kompas']; */
 
 export function SearchFilters({ filters, onChange }: SearchFiltersProps) {
-  const handleSort = (sort: SortOption) => onChange({ ...filters, sort });
+  /* const handleSort = (sort: SortOption) => onChange({ ...filters, sort }); */
   const handleYear = (year: string) => onChange({ ...filters, year });
 
-  const toggleSource = (source: string) => {
+  /* const toggleSource = (source: string) => {
     const active = filters.sources.includes(source);
     onChange({
       ...filters,
       sources: active ? filters.sources.filter((entry) => entry !== source) : [...filters.sources, source],
     });
-  };
+  }; */
 
   const isDefault =
     filters.sort === 'relevance' &&
@@ -41,7 +41,7 @@ export function SearchFilters({ filters, onChange }: SearchFiltersProps) {
 
   return (
     <aside className="filters" aria-label="Penyaring hasil">
-      <div className="filters__group">
+      {/* <div className="filters__group">
         <h2 className="filters__title">
           <ArrowDownUp size={12} aria-hidden="true" style={{ display: 'inline', marginRight: 6 }} />
           Urutkan
@@ -58,7 +58,7 @@ export function SearchFilters({ filters, onChange }: SearchFiltersProps) {
             <span>{option.label}</span>
           </label>
         ))}
-      </div>
+      </div> */}
 
       <div className="filters__group">
         <h2 className="filters__title">
@@ -79,7 +79,7 @@ export function SearchFilters({ filters, onChange }: SearchFiltersProps) {
         ))}
       </div>
 
-      <div className="filters__group">
+      {/* <div className="filters__group">
         <h2 className="filters__title">
           <Landmark size={12} aria-hidden="true" style={{ display: 'inline', marginRight: 6 }} />
           Sumber
@@ -95,7 +95,7 @@ export function SearchFilters({ filters, onChange }: SearchFiltersProps) {
             <span>{source}</span>
           </label>
         ))}
-      </div>
+      </div> */}
 
       {!isDefault && (
         <button

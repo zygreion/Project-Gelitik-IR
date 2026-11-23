@@ -12,7 +12,7 @@ interface SearchResultCardProps {
 
 export function SearchResultCard({ result, terms, query }: SearchResultCardProps) {
   const meta = [result.source, result.author, result.topic].filter(Boolean);
-  const documentHref = `/document/${encodeURIComponent(result.id)}?q=${encodeURIComponent(query)}`;
+  const documentHref = `/document/${encodeURIComponent(result.id)}?${new URLSearchParams({ q: query })}`;
 
   return (
     <article className="result-item">

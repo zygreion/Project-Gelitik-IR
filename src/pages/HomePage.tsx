@@ -38,7 +38,7 @@ export function HomePage() {
   const runSearch = (value: string) => {
     const trimmed = value.trim();
     if (!trimmed) return;
-    navigate(`/search?q=${encodeURIComponent(trimmed)}`);
+    navigate(`/search?${new URLSearchParams({ q: trimmed })}`);
     window.scrollTo({
       top: 0,
       behavior: "smooth",
