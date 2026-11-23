@@ -35,6 +35,12 @@ function delay(ms: number): Promise<void> {
 }
 
 function asString(value: unknown): string | undefined {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => (typeof item === 'string' ? item.trim() : String(item)))
+      .filter(Boolean)
+      .join('\n\n');
+  }
   return typeof value === 'string' && value.trim() ? value : undefined;
 }
 

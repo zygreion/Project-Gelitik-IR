@@ -909,11 +909,13 @@ mark {
   max-width: 720px;
 }
 
-.document__body p {
+.document__body p,
+.document__paragraph {
   font-size: 16.5px;
   line-height: 1.85;
   color: var(--ink-700);
-  margin-bottom: 18px;
+  padding: 10px 0;
+  margin: 0;
 }
 
 .document__aside {

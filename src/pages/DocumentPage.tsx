@@ -108,7 +108,9 @@ export function DocumentPage() {
 
               <div className="document__body">
                 {toParagraphs(document.content).map((paragraph, index) => (
-                  <p key={index}>{paragraph}</p>
+                  <p key={index} className="document__paragraph">
+                    {paragraph}
+                  </p>
                 ))}
 
                 {!document.content.trim() && (

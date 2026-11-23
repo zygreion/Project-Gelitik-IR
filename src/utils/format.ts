@@ -76,7 +76,11 @@ export function extractYear(value?: string): string | undefined {
 }
 
 /** Splits a document body into readable paragraphs. */
-export function toParagraphs(text: string): string[] {
+export function toParagraphs(text?: string | string[]): string[] {
+  if (!text) return [];
+  if (Array.isArray(text)) {
+    return text.map((paragraph) => paragraph.trim()).filter(Boolean);
+  }
   return text
     .split(/\n+/)
     .map((paragraph) => paragraph.trim())

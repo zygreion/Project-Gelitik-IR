@@ -23,6 +23,6 @@ export const DEMO_CORPUS: MockDocument[] = data.map((d) => {
     topic,
     url,
     author,
-    text: text.join(" "),
+    text: Array.isArray(text) ? text.join("\n\n") : String(text),
   };
 });
