@@ -160,8 +160,6 @@ export async function searchDocuments(
     return runMockSearch(searchRequest);
   }
 
-  console.log(searchRequest);
-
   const payload = await request<unknown>('/search', {
     method: 'POST',
     body: JSON.stringify(searchRequest2),
