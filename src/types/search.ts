@@ -15,6 +15,11 @@ export interface SearchRequest {
   sources?: string[];
 }
 
+export interface SearchRequest2 {
+  terms: string;
+  year?: string;
+}
+
 /** A single ranked document, as rendered by the results list. */
 export interface SearchResult {
   id: string;

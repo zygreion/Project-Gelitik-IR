@@ -13,6 +13,7 @@ import {
   type DocumentDetail,
   type SearchFilters,
   type SearchRequest,
+  type SearchRequest2,
   type SearchResponse,
   type SearchResult,
 } from '../types/search';
@@ -148,15 +149,22 @@ export async function searchDocuments(
     sources: filters?.sources,
   };
 
+  const searchRequest2: SearchRequest2 = {
+    terms: trimmed,
+    year: filters?.year === 'all' ? undefined : filters?.year,
+  };
+
   if (IS_MOCK_MODE) {
     await delay(MOCK_LATENCY_MS);
     if (signal?.aborted) throw new DOMException('Aborted', 'AbortError');
     return runMockSearch(searchRequest);
   }
 
+  console.log(searchRequest);
+
   const payload = await request<unknown>('/search', {
     method: 'POST',
-    body: JSON.stringify(searchRequest),
+    body: JSON.stringify(searchRequest2),
     signal,
   });
 
