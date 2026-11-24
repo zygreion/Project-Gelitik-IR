@@ -105,3 +105,18 @@ export function prettyUrl(url?: string): string {
     return url;
   }
 }
+
+export type Media = 'antara' | 'kompas' | 'idn times'
+
+export function formatMedia(media: Media): string {
+  const mediaLower = media.toLowerCase() as Media;
+
+  const mediaMap: Record<Media, string> = {
+    antara: "Antara",
+    "idn times": "IDN Times",
+    kompas: "Kompas.com",
+  };
+
+  if (mediaLower in mediaMap) return mediaMap[mediaLower];
+  else return "UNKNOWN";
+}

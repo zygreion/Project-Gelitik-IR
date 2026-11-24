@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ExternalLink, Gauge } from 'lucide-react';
 import { HighlightedText } from '../common/HighlightedText';
-import { formatDate, formatScore, prettyUrl } from '../../utils/format';
+import { formatDate, formatMedia, formatScore, prettyUrl, type Media } from '../../utils/format';
 import type { SearchResult } from '../../types/search';
 
 interface SearchResultCardProps {
@@ -17,7 +17,7 @@ export function SearchResultCard({ result, terms, query }: SearchResultCardProps
   return (
     <article className="result-item">
       <p className="result-item__source">
-        {result.source && <strong>{result.source}</strong>}
+        {result.source && <strong>{formatMedia(result.source as Media)}</strong>}
         {result.author && (
           <>
             {meta.length > 0 && <span className="result-item__dot">·</span>}

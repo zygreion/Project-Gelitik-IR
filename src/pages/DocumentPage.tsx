@@ -4,7 +4,7 @@ import { ArrowLeft, CalendarDays, ExternalLink, FileText, Hash, Landmark, User }
 import { ErrorState } from '../components/common/ErrorState';
 import { fetchDocument } from '../services/searchService';
 import { SearchError, type DocumentDetail } from '../types/search';
-import { formatDate, toParagraphs } from '../utils/format';
+import { formatDate, formatMedia, toParagraphs, type Media } from '../utils/format';
 
 interface DocumentState {
   id: string;
@@ -101,7 +101,7 @@ export function DocumentPage() {
                 {document.source && (
                   <span className="document__meta-item">
                     <Landmark size={15} aria-hidden="true" />
-                    <strong>{document.source}</strong>
+                    <strong>{formatMedia(document.source as Media)}</strong>
                   </span>
                 )}
                 {document.author && (
@@ -155,7 +155,7 @@ export function DocumentPage() {
               {document.source && (
                 <div className="document__aside-row">
                   <span>Penerbit</span>
-                  <span>{document.source}</span>
+                  <span>{formatMedia(document.source as Media)}</span>
                 </div>
               )}
 
